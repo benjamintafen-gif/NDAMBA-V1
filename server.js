@@ -484,7 +484,8 @@ wss.on('connection', ws => {
     if (msg.type === 'roll') {
       const cur = room.state.cur;
       if (room.players[cur].id !== myPlayerId) return;
-      if (room.state.phase !== 'idle') return;
+    if (room.state.phase !== 'idle' && room.state.phase !== 'moving') return;
+room.state.phase = 'rolling';
 
       // Check pending investment
       const p = room.players[cur];
@@ -665,12 +666,10 @@ function triggerCase(room, pos) {
     const bonusTo = Math.min(89, pos+2);
     p.pos = bonusTo;
     addLog(room, `⭐ ${p.name} avance de 2 cases bonus → case ${bonusTo+1}: ${CASES[bonusTo].n}`, '#a0a0ff');
-    if (bonusTo >= 89) { checkWin(room); }
+    if (bonusTo >= 89) { checkWin(room); broadcast(room, roomSnapshot(room)); }
     else { triggerCase(room, bonusTo); }
-    broadcast(room, roomSnapshot(room));
     return;
   }
-
   if (cas.t === 'kado') { const k = rand(KADO); card = { type:'kado', data:k, text:k.t }; }
   else if (cas.t === 'action') { const a = rand(ACTION); card = { type:'action', text:a }; }
   else if (cas.t === 'culture') { const cu = rand(CULTURE); card = { type:'culture', q:cu.q, a:cu.a, text:cu.q }; }
@@ -695,9 +694,10 @@ function triggerCase(room, pos) {
 }
 
 function doNextTurn(room) {
+  function doNextTurn(room) {
   room.state.pendingCard = null;
+  room.state.phase = 'idle';
   nextTurn(room);
-  broadcast(room, roomSnapshot(room));
   const cur = room.state.cur;
   const p = room.players[cur];
   broadcast(room, { type:'toast', name: p.name, color: p.color });
