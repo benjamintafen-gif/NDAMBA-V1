@@ -1,0 +1,18 @@
+{
+  "name": "ndamba-online",
+  "version": "1.0.0",
+  "description": "NDAMBA - Jeu de plateau camerounais multijoueur en ligne",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.0"
+  }
+}
